@@ -5,11 +5,11 @@ Clone the Github respository and use your explorer to open `index.html`, then yo
 ### How to play
 Press `p` to start or pause. Remember you have a limited time to reach the river. If you win or lose, you can press `r` to restart the game. You can also press `s` to change the character.
 ### Specific rules
-Gems with different colors have different scores.
+1. Gems with different colors have different scores.
 - Blue gem: 100
 - Green gem: 200
 - Orange gem: 300
-If your score is above or equal to 4000, you will get an extra life. 
+2. If your score is above or equal to 4000, you will get an extra life. 
 When you collect a green gem, all bugs will restart from left side.
 When you collect an orange gem, all bugs will slow done.
 The effect of green gems and orange gems can accumulate.
