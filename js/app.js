@@ -28,7 +28,10 @@ const GEM_BLUE_SCORE = 100;
 const GEM_GREEN_SCORE = 200;
 const GEM_ORANGE_SCORE = 300;
 const SCORES_FOR_HEART = 4000;
-const COLLISION_RADIUS = 50;
+const COLLISION_RADIUS = 75; // how to set appropriate collision radius ?
+// project into x axis, see if there is a gap
+// blank pixels on the player's left and right are approximately 18px; blank pixels on tht bug't left and right are ~2px, so gap = (bug.x - player.x) - ((101 - 18) + 2)
+// if gap > 0, no collision. But when setting COLLISION_RADIUS to 81(computed value), collsion seems to happen a little early, so set it to 75
 const eps = 1e-2;
 const UPMOST_RENDERY = -23;
 const VELOCITY_UPMOST = 300;
@@ -303,7 +306,8 @@ Enemy.prototype.update = function(dt) {
     if(this.x > BOARDS_XGRIDS * CELL_WIDTH) {
         this.init();
     }
-    if(Math.abs(this.x - player.x) < COLLISION_RADIUS  && this.y === player.y) {
+    if(Math.abs(this.x - player.x)< COLLISION_RADIUS  && this.y === player.y) {
+        console.log("collision happened!");
         player.handleFailure();
     }
 };
@@ -353,17 +357,24 @@ Player.prototype.initXY = function(){
         //the above is a brute solution for making sure the player can move when generated randomly (not surrounded by rocks)
         else    this.x = Math.floor(Math.random() * BOARDS_XGRIDS) * CELL_WIDTH;
 
-    } while(background.setBoard(this.x, this.y, this) === false)
+    } while(background.getBoard(this.x, this.y) !== 0)
+    //fix the bug here, call getBoard rather than setBoard, so don't need to clear the previous location of the player
 };
 
 /**
 * @description Deals with the time out event
 */
-Player.prototype.update = function() { //used to handle collision in this function, but did't work, can't figure out why
+Player.prototype.update = function() {
     if(Math.abs(background.time - 0) < eps) {
         this.handleFailure();
         background.time = background.baseLevel.time;
     }
+    // allEnemies.forEach(function(enemy) { // another method to handle collision between enemies and player
+    //     if(enemy.x - player.x < COLLISION_RADIUS && enemy.y === player.y) {
+    //         console.log("collision happened");
+    //         player.handleFailure();
+    //     }
+    // });
 };
 /**
 * @description Reset player's location and his life
@@ -417,7 +428,7 @@ Player.prototype.handleInput = function(keyCode) {
         }
         else if(keyCode === 'up') {
             if(this.y !== UPMOST_RENDERY) {
-                if(this.y !== APPRO_INITIAL_Y) { // if y == 60, since up is water, there is no roc
+                if(this.y !== APPRO_INITIAL_Y) { // if y == 60, since up is water, there is no rock
                     obj = background.getBoard(this.x, this.y - CELL_HEIGHT);
                     if(obj instanceof Rock)   return;
                 }
@@ -443,6 +454,7 @@ Player.prototype.handleInput = function(keyCode) {
         }else if(obj instanceof Heart){
             obj.update();
         }
+        // console.log(background.board);
         if(this.y == UPMOST_RENDERY)  {
             background.levelUp();
             this.initXY();
